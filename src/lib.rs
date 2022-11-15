@@ -30,6 +30,22 @@ mod tests {
         let data = compress([255 * 2, 255, 255]);
         assert_eq!(data, [1 << 6, 255, 0, 0]);
     }
+
+    #[test]
+    fn test_lots_of_numbers() {
+        // create lots of input data, data can be grouped by three
+        let mut data: Vec<u32> = (0..256).map(|i| i * i * i * i).collect();
+        data.extend(0..256);
+        data.extend((0..256).map(|i| i << 12));
+
+        let cmpr = compress(data.iter().cloned());
+        let result = decompress(&cmpr).to_vec();
+
+        assert_eq!(
+            result, data,
+            "expect data to be the same before and after compression/decompression"
+        );
+    }
 }
 
 pub struct DataBlockIter<'a> {
@@ -37,7 +53,7 @@ pub struct DataBlockIter<'a> {
 }
 
 impl<'a> DataBlockIter<'a> {
-    pub fn collect(self) -> Vec<u32> {
+    pub fn to_vec(self) -> Vec<u32> {
         let mut v = Vec::new();
 
         for [a, b, c] in self {
@@ -121,7 +137,7 @@ fn max_viable_offset(chunk: [u32; 3]) -> u8 {
 
         let [a, b, c] = chunk.map(|elem| elem >= offset);
 
-        if a | b | c {
+        if a & b & c {
             return i;
         }
     }
@@ -163,6 +179,7 @@ fn compress_block(buffer: &mut Vec<u8>, chunk: [u32; 3]) {
 
 use smallvec::SmallVec;
 
+/// Compressed list of u32 integers.
 pub struct ListUInt32 {
     data: Vec<u8>,
     head: SmallVec<[u32; 3]>,
@@ -185,9 +202,9 @@ impl ListUInt32 {
         }
     }
 
-    pub fn collect(&self) -> Vec<u32> {
+    pub fn to_vec(&self) -> Vec<u32> {
         let i = DataBlockIter { data: &self.data };
-        let mut v = i.collect();
+        let mut v = i.to_vec();
         for i in &self.head {
             v.push(*i);
         }
