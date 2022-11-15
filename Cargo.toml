@@ -13,3 +13,6 @@ categories = ["algorithms", "compression"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# 'Small vector' optimization: store up to a small number of items on the stack
+smallvec = "1.10.0"
+

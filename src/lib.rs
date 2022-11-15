@@ -177,8 +177,8 @@ impl ListUInt32 {
     }
 
     pub fn push(&mut self, value: u32) {
-        if self.head.len() == 3 {
-            let chunk = [self.head[0], self.head[1], self.head[2], value];
+        if self.head.len() == 2 {
+            let chunk = [self.head[0], self.head[1], self.head[2]];
             compress_block(&mut self.data, chunk);
         } else {
             self.head.push(value);
