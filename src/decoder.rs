@@ -529,5 +529,6 @@ pub(crate) fn decode_block(v: u8, data: &[u8]) -> (u32, u32, u32, usize) {
                 | (data[11] as u32) << 24;
             (v0, v1, v2, 12)
         } // END
+        _ => unreachable!(),
     }
 }
