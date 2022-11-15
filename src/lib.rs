@@ -39,7 +39,7 @@ mod tests {
         data.extend((0..256).map(|i| i << 12));
 
         let cmpr = compress(data.iter().cloned());
-        let result = decompress(&cmpr).to_vec();
+        let result = decompress(&cmpr);
 
         assert_eq!(
             result, data,
@@ -48,12 +48,12 @@ mod tests {
     }
 }
 
-pub struct DataBlockIter<'a> {
+struct DataBlockIter<'a> {
     data: &'a [u8],
 }
 
 impl<'a> DataBlockIter<'a> {
-    pub fn to_vec(self) -> Vec<u32> {
+    fn to_vec(self) -> Vec<u32> {
         let mut v = Vec::new();
 
         for [a, b, c] in self {
@@ -100,8 +100,8 @@ impl<'a> Iterator for DataBlockIter<'a> {
     }
 }
 
-pub fn decompress(data: &[u8]) -> DataBlockIter {
-    DataBlockIter { data }
+pub fn decompress(data: &[u8]) -> Vec<u32> {
+    DataBlockIter { data }.to_vec()
 }
 
 pub fn compress(iter: impl IntoIterator<Item = u32>) -> Vec<u8> {
